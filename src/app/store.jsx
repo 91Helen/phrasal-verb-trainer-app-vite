@@ -1,0 +1,36 @@
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; 
+
+import verbsReducer from '../features/verbs/verbsSlice.jsx';
+import favoritesReducer from '../features/favorites/favoritesSlice.jsx';
+import trainerReducer from '../features/trainer/trainerSlice.jsx';
+import progressReducer from '../features/progress/progressSlice.jsx';
+
+// persist настройки 
+const favoritesPersistConfig = {
+  key: 'favorites',
+  storage,
+};
+
+const persistedFavoritesReducer = persistReducer(
+  favoritesPersistConfig,
+  favoritesReducer
+);
+
+export const store = configureStore({
+  reducer: {
+    verbs: verbsReducer,
+    favorites: persistedFavoritesReducer, 
+    trainer: trainerReducer,
+    progress: progressReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
+});
+
+export const persistor = persistStore(store);
